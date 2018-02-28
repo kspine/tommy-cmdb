@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/upload_db/" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>用户名：{{ obj.username }}{{ obj.errors.username.0 }}</p>
+    <p>文件：{{ obj.file }}{{ obj.errors.file.0 }}</p>
+    <input type="submit" value="点击上传">{{ xinxi }}
+    <p><a href="{{ down_url }}" target="_blank">{{ down_url }}</a></p>
+</form>
+</body>
+</html>

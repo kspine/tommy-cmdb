@@ -1,0 +1,71 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="{% static "bower_components/jquery/dist/jquery.min.js" %}"></script>
+</head>
+<body>
+
+<button class="btn btn-primary" onclick="testDemo();">Test</button>
+
+<script type="text/javascript">
+    //注意，如果远程主机的访问地址是以IP形式出现的，可以忽略此步骤，直接调用 login 方法。具体登陆地址端口请根据实际情况更改.
+    var testDemo = function() {
+        $.ajax({
+            url: "http://192.168.80.135:8080/console/chksshdaddr?rnd=" + Math.random(),
+            method: "POST",
+            data: {
+                "vm_addr": "192.168.80.201:22",
+            },
+            dataType: "jsonp",
+            cache: false,
+        }).done(function(data) {
+            var json = data;
+            if (typeof(data) != "object") {
+                json = $.parseJSON(data);
+            }
+            if (json.ok) {
+                console.log("en_addr:", json.data.sshd_addr);
+                login(json.data.sshd_addr, "root", "123456");
+            } else {
+                alert("登陆失败，请确认您的主机信息。");
+            }
+        }).fail(function() {
+            alert("未知失败，请联系管理员。");
+        });
+    };
+    //注意，如果远程主机的访问地址是以域名或主机形式出现的，可以执行上面步骤后，再调用本方法。具体登陆地址端口请根据实际情况更改.
+    var login = function(enVMAddr, username, password) {
+        $.ajax({
+            //url: "http://192.168.80.135:8080/console/login?rnd=" + Math.random(),
+            url: "http://192.168.80.201/console/login?rnd=" + Math.random(),
+            method: "POST",
+            data: {
+                "vm_addr": enVMAddr,
+                "user_name": username,
+                "user_pwd": password
+            },
+            dataType: "jsonp",
+            cache: false,
+        }).done(function(data) {
+            var json = data;
+            if (typeof(data) != "object") {
+                json = $.parseJSON(data);
+            }
+            if (json.ok) {
+                //location.href = "http://192.168.80.135:8080" + json.data;
+                //window.open("http://192.168.80.135:8080" + json.data);
+                window.open("http://192.168.80.201" + json.data);
+            } else {
+                alert("登陆失败，请确认您的登陆信息。");
+            }
+        }).fail(function() {
+            alert("未知失败，请联系管理员。");
+        });
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}主机详情{% endblock %}
+
+{% block tit %}主机详情{% endblock %}
+
+{% block context %}
+    <!--os-->
+    <div class="box" style="margin-top: 10px">
+        <div class="box-header with-border">
+          <h3 class="box-title">OS</h3>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+              <i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+              <i class="fa fa-times"></i></button>
+          </div>
+        </div>
+        <div class="box-body" style="">
+          <pre>
+              {% for i in os %}
+                  {{ i }}
+                {% endfor %}
+            </pre>
+        </div>
+      </div>
+    <!--cpu-->
+    <div class="box" style="margin-top: 10px">
+        <div class="box-header with-border">
+          <h3 class="box-title">CPU</h3>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+              <i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+              <i class="fa fa-times"></i></button>
+          </div>
+        </div>
+        <div class="box-body" style="">
+          <pre>
+              {% for i in cpu %}
+                  {{ i }}
+                {% endfor %}
+            </pre>
+        </div>
+      </div>
+    <!--mem-->
+    <div class="box" style="margin-top: 10px">
+        <div class="box-header with-border">
+          <h3 class="box-title">MEM</h3>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+              <i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+              <i class="fa fa-times"></i></button>
+          </div>
+        </div>
+        <div class="box-body" style="">
+             <pre>
+              {% for i in mem %}
+                  {{ i }}
+                {% endfor %}
+            </pre>
+        </div>
+      </div>
+    <!--disk-->
+    <div class="box" style="margin-top: 10px">
+        <div class="box-header with-border">
+          <h3 class="box-title">DISK</h3>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+              <i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+              <i class="fa fa-times"></i></button>
+          </div>
+        </div>
+        <div class="box-body" style="">
+            <pre>
+              {% for i in disk %}
+                  {{ i }}
+                {% endfor %}
+            </pre>
+        </div>
+      </div>
+
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{{ edit_host_obj.ip }}主机修改{% endblock %}
+
+<!--首部引入javascript-->
+{% block title_load_javascript %}{% endblock %}
+
+<!--右侧类容-->
+{% block context %}
+    <div class="box" style="padding-left: 30px;">
+        <div class="box-header with-border">
+          <h3 class="box-title">{{ edit_host_obj.ip }}主机修改</h3>
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+              <i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+              <i class="fa fa-times"></i></button>
+          </div>
+        </div>
+        <div class="box-body" style="">
+            <form action="/assets/host_edit/{{ edit_host_obj.id }}" method="post">
+                {% csrf_token %}
+                <table>
+                    <tr style="height: 35px">
+                        <th>Host ID：</th>
+                        <th>
+                            <input type="text" disabled="disabled" name="id" value="{{ edit_host_obj.id }}">
+                        </th>
+                        <th>*不可修改</th>
+                    </tr>
+                    <tr style="height: 35px">
+                        <th>IP地址：</th>
+                        <th>
+                            <input type="text" disabled="disabled" name="ip" value="{{ edit_host_obj.ip }}">
+                        </th>
+                        <th>*不可修改</th>
+                    </tr>
+                    <tr style="height: 35px">
+                        <th>端口：</th>
+                        <th>
+                            <input type="number" name="port" min="1" max="65535" required="" id="id_port" value="{{ edit_host_obj.port }}">
+
+                        </th>
+                        <th>{{ obj.ip.port.as_text }}</th>
+                    </tr>
+                    <tr style="height: 35px">
+                        <th>ssh用户名：</th>
+                        <th><input type="text"  name="username" value="{{ edit_host_obj.user }}"></th>
+                        <th>{{ obj.user.errors.as_text }}</th>
+                    </tr>
+                    <tr style="height: 35px">
+                        <th>ssh密码：</th>
+                        <th><input type="password"  name="password" value="{{ edit_host_obj.password }}" maxlength="20"></th>
+                        <th>{{ obj.password.errors.as_text }}</th>
+                    </tr>
+                    <tr style="height: 35px">
+                        <th>机房选择：</th>
+                        <th>
+                            <select name="jifang">
+                                {% for jifang in jifang_obj %}
+                                    {% if edit_host_obj.jifang.id == jifang.id %}
+                                        <option value="{{ jifang.id }}" selected="selected">{{ jifang.jifang_dizhi }}</option>
+                                    {% else %}
+                                        <option value="{{ jifang.id }}">{{ jifang.jifang_dizhi }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th>{{ obj.password.errors.as_text }}</th>
+                    </tr>
+
+                    <tr style="height: 35px">
+                        <th>管理用户组：</th>
+                        <th>
+                            <select name="user_group"  multiple="multiple" size="3">
+                                {% for user_group in user_group_obj %}
+                                    {% if user_group.id in host_user_groups_id  %}
+                                        <option value ="{{ user_group.id }}"  selected="selected">{{ user_group.group_name }}</option>
+                                    {% else %}
+                                        <option value ="{{ user_group.id }}" >{{ user_group.group_name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </th>
+                        <th>*非必选项，可以多选{{ obj.password.errors.as_text }}</th>
+                    </tr>
+                    <tr style="height: 35px">
+                        <th>禁用：</th>
+                        <th>
+                            {% if edit_host_obj.status == '1' %}
+                                <input type="radio" name="status" checked="checked" value="1">启用 <input type="radio" name="status" value="0">禁用
+                            {% else %}
+                                <input type="radio" name="status" value="1">启用 <input type="radio" name="status" checked="checked" value="0">禁用
+                            {% endif %}
+                        </th>
+                        <th>{{ obj.password.errors.as_text }}</th>
+                    </tr>
+
+                </table>
+
+                <div class="box-footer" style="margin: 0 auto;">
+                    {% if not req_status == "没有权限" %}
+                        <button type="submit" class="btn btn-primary">修改主机</button>
+                    {% else %}
+                        <span style="color: red"><b>没有权限</b></span>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        <!-- /.box-body
+        <div class="box-footer">
+            <span style="color: red;">{{ xinxi }}</span>
+        </div>-->
+      </div>
+         {% if xinxi == "主机存在，不能重复添加" %}
+            <div class="callout callout-danger">
+              <h4>Warning!</h4>
+              <p>主机存在，不能重复添加</p>
+            </div>
+         {% elif xinxi == "添加成功" %}
+            <div class="callout callout-info">
+              <h4>Right!</h4>
+              <p>添加成功</p>
+            </div>
+        {% endif %}
+
+{% endblock %}
+
+<!--底部引入javascript-->
+{% block dibu_load_javascript %}{% endblock %}
+

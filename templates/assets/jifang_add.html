@@ -1,0 +1,140 @@
+
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}首页{% endblock %}
+
+<!--首部引入javascript-->
+{% block title_load_javascript %}
+    <script src="{% static "bower_components/jquery/dist/jquery.min.js" %}"></script>
+{% endblock %}
+
+<!--右侧类容-->
+{% block context %}
+    <!--添加机房-->
+    {% if login_user_is_super == '1' %}
+        <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">添加机房</h3>
+            </div>
+            <form role="form" action="{% url "jifang_add" %}" method="post">
+                {% csrf_token %}
+                <table style="padding-left: 10px;">
+                    <tr>
+                        <td>{{ obj.as_ul }}</td>
+                        <td><button type="submit" class="btn btn-primary">添加机房</button></td>
+                        <td style="color: red">{{ add_jifang_err }}</td>
+                    </tr>
+                </table>
+
+            </form>
+          </div>
+    {% endif %}
+    <!--机房列表-->
+    <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">机房列表</h3>
+
+              <div class="box-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">
+                  <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+
+                  <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+                <tbody><tr>
+                  <th>ID</th>
+                  <th>机房</th>
+                  <th>主机</th>
+                  <th>操作</th>
+                </tr>
+                {% for jifang in contacts %}
+                <tr>
+                  <td>{{ jifang.id }}</td>
+                  <td>{{ jifang.jifang_dizhi }}</td>
+                  <td>
+
+                      {% for i in jifang.hosts_set.values_list  %}
+                          <span style="font-size: xx-small">{{ i.1 }}&nbsp;&nbsp;</span>
+                      {% endfor %}
+
+                  </td>
+                  <td>
+                      {% if login_user_is_super == '1' %}
+                          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-danger"  id="delete{{ jifang.id  }}">删除</button>
+                      {% endif %}
+                  </td>
+                    <td></td>
+                </tr>
+                    <script>
+                        $(function () {
+                            $("#delete{{ jifang.id  }}").click(function(){  //当id get_msg_do点击的时候
+                                var del_id={{ jifang.id }}
+                                var url = '{% url "jifang_del" %}';  //设置变量URL的值
+                                var data = {del_id:del_id,csrfmiddlewaretoken: '{{ csrf_token }}'};	//设置需要发送的数据
+                                $.post(url,data,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                    if(msg.req_status=='1'){
+                                        alert("{{ jifang.jifang_dizhi }}删除成功");
+                                        //location.href = "{{ request.META.HTTP_REFERER }}"
+                                        location.href = "{% url "jifang_add" %}?page={{ page }}"
+                                    }
+                                });
+                            });
+                        })
+
+                    </script>
+                {% endfor %}
+
+              </tbody></table>
+            <div class="box-footer clearfix">
+              <ul class="pagination pagination-sm no-margin pull-right">
+                    <!--上一页-->
+                   {%  if contacts.has_previous %}
+                        <li><a href="{% url "jifang_add" %}?page={{ page|add:-1 }}">«</a></li>
+                   {% endif %}
+
+                  {%  if contacts.has_previous %}
+                    <li><a href="{% url "jifang_add" %}?page={{ page|add:-1 }}">{{ page|add:-1 }}</a></li>
+                  {% endif %}
+
+                  <li class="active"><a href="{% url "jifang_add" %}?page={{ page }}">{{ page }}</a></li>
+
+                  {%  if contacts.has_next %}
+                    <li><a href="{% url "jifang_add" %}?page={{ page|add:1 }}">{{ page|add:1 }}</a></li>
+                  {% endif %}
+                    <!--下一页-->
+                  {%  if contacts.has_next %}
+                    <li><a href="{% url "jifang_add" %}?page={{ page|add:1 }}">»</a></li>
+                  {% endif %}
+              </ul>
+            </div>
+
+
+
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+
+{% endblock %}
+
+<!--底部引入javascript-->
+{% block dibu_load_javascript %}
+    <script>
+        $(function () {
+            //location.href = "{% url "jifang_add" %}"
+        })
+
+    </script>
+
+{% endblock %}
+

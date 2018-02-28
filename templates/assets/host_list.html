@@ -1,0 +1,269 @@
+
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}首页{% endblock %}
+
+<!--首部引入javascript-->
+{% block title_load_javascript %}
+    <script src="{% static "bower_components/jquery/dist/jquery.min.js" %}"></script>
+{% endblock %}
+
+<!--右侧类容-->
+{% block context %}
+    <!--主机列表-->
+    <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">机房列表</h3>
+
+              <div class="box-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">
+                  <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+
+                  <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover">
+                <tbody><tr>
+                  <th>ID</th>
+                  <th>IP</th>
+                  <th>用户</th>
+                  <th>机房</th>
+                  <th>管理组</th>
+                  <th>禁用</th>
+                  <th>操作</th>
+                </tr>
+                {% for host in contacts %}
+                <tr>
+                  <td>{{ host.id }}</td>
+                  <td><span><b>{{ host.ip }}</b></span></td>
+                  <td>{{ host.user }}</td>
+                  <td>{{ host.jifang }}</td>
+                  <td style="font-size: x-small">
+                    {% for i in host.user_groups.values %}
+                        {{ i.group_name }} &nbsp;&nbsp;&nbsp;
+                    {% endfor %}
+
+                  </td>
+                    <td>
+                        {% if host.status == "1" %}
+                            <span class="label label-success">正常</span>
+                        {% else %}
+                            <span class="label label-danger">禁用</span>
+                        {% endif %}
+                    </td>
+                  <td>
+                      {% if host.status == "1" %}
+                      <!--操作的列表-->
+                          <div class="btn-group">
+                              <button type="button" class="btn btn-info">操作</button>
+                              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                              </button>
+                              <ul class="dropdown-menu" role="menu">
+                                <li><a href="/assets/host_edit/{{ host.id }}">修改主机</a></li>
+                                <li><a href="/assets/host_info/{{ host.id }}">主机信息</a></li>
+                                <li id="webshell{{ host.id }}" ><a  href="#">webshell</a></li>
+                                <li class="divider"></li>
+                                {% if login_user_is_super == "1" %}
+                                    <li id="reboot{{ host.id }}"><a href="#">重启</a></li>
+                                    <li id="shutdown{{ host.id }}"><a href="#">关机</a></li>
+                                 {% else %}
+                                    <li id="reboot{{ host.id }}"><a href="#">重启</a></li>
+                                    <li id="shutdown{{ host.id }}"><a href="#">关机</a></li>
+                                {% endif %}
+                              </ul>
+                            </div>
+                          {% if login_user_is_super == "1" %}
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-danger"  id="delete{{ host.id }}">删除</button>
+                          {% endif %}
+                      {% else %}
+                        <a href="/assets/host_edit/{{ host.id }}">
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-danger"  id="edit{{ host.id }}">修改</button>
+                        </a>
+                          {% if login_user_is_super == "1" %}
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-danger"  id="delete{{ host.id }}">删除</button>
+                          {% endif %}
+                      {% endif %}
+
+                  </td>
+                    <td></td>
+                </tr>
+                    <script>
+                        $(function () {
+                            //webshell
+                            $("#webshell{{ host.id }}").click(function() {
+                                $.ajax({
+                                    url: "http://192.168.3.209/console/chksshdaddr?rnd=" + Math.random(),
+                                    method: "POST",
+                                    data: {
+                                        "vm_addr": "{{ host.ip }}:{{ host.port }}",
+                                    },
+                                    dataType: "jsonp",
+                                    cache: false,
+                                }).done(function(data) {
+                                    var json = data;
+                                    if (typeof(data) != "object") {
+                                        json = $.parseJSON(data);
+                                    }
+                                    if (json.ok) {
+                                        console.log("en_addr:", json.data.sshd_addr);
+                                        login(json.data.sshd_addr, "{{ host.user }}", "{{ host.password }}");
+                                    } else {
+                                        alert("{{ host.ip }}登陆失败，主机信息验证失败，请联系管理员。");
+                                    }
+                                }).fail(function() {
+                                    alert("未知失败，请联系管理员。");
+                                });
+                            });
+                                //注意，如果远程主机的访问地址是以IP形式出现的，可以忽略此步骤，直接调用 login 方法。具体登陆地址端口请根据实际情况更改.
+                            //注意，如果远程主机的访问地址是以域名或主机形式出现的，可以执行上面步骤后，再调用本方法。具体登陆地址端口请根据实际情况更改.
+                            var login = function(enVMAddr, username, password) {
+                                $.ajax({
+                                    //url: "http://192.168.80.135:8080/console/login?rnd=" + Math.random(),
+                                    url: "http://192.168.3.209/console/login?rnd=" + Math.random(),
+                                    method: "POST",
+                                    data: {
+                                        "vm_addr": enVMAddr,
+                                        "user_name": username,
+                                        "user_pwd": password
+                                    },
+                                    dataType: "jsonp",
+                                    cache: false,
+                                }).done(function(data) {
+                                    var json = data;
+                                    if (typeof(data) != "object") {
+                                        json = $.parseJSON(data);
+                                    }
+                                    if (json.ok) {
+                                        //location.href = "http://192.168.80.135:8080" + json.data;
+                                        //window.open("http://192.168.80.135:8080" + json.data);
+                                        window.open("http://192.168.3.209" + json.data);
+                                    } else {
+                                        alert("{{ host.ip }}登陆失败，主机信息验证失败，请联系管理员。");
+                                    }
+                                }).fail(function() {
+                                    alert("未知失败，请联系管理员。");
+                                });
+                            };
+
+                            //删除
+                            $("#delete{{ host.id }}").click(function () {
+                                    var id = {{ host.id }}; //获取变量iphone =input iphone_g的值
+                                    var url = '{% url "host_del" %}';  //设置变量URL的值
+                                    var data = {id:id,csrfmiddlewaretoken: '{{ csrf_token }}'};	//设置需要发送的数据
+                                    $.post(url,data,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                        if(msg.req_status=='1'){
+                                            alert("{{ host.ip }}删除成功");
+                                            location.href = "{% url "host_list" %}?page={{ page }}"
+
+                                        }else{
+                                           alert("{{ host.ip }}删除失败");
+                                           location.href = "{% url "host_list" %}?page={{ page }}"
+                                        }
+                                    });
+                                });
+                            //重启
+                            $("#reboot{{ host.id }}").click(function () {
+                                    var id = {{ host.id }}; //获取变量iphone =input iphone_g的值
+                                    var ip = "{{ host.ip }}";
+                                    var port = {{ host.port }};
+                                    var user = "{{ host.user }}";
+                                    var password = "{{ host.password }}";
+                                    var cmd = "reboot";
+                                    var url = '{% url "host_shell" %}';  //设置变量URL的值
+                                    var data = {id:id,ip:ip,port:port,user:user,password:password,cmd:cmd,csrfmiddlewaretoken: '{{ csrf_token }}'};	//设置需要发送的数据
+                                    $.post(url,data,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                        if(msg.req_status=='1'){
+                                            alert("{{ host.ip }}重启成功，正在进行");
+                                            location.href = "{% url "host_list" %}?page={{ page }}"
+
+                                        }else{
+                                           alert("{{ host.ip }}重启失败,账号密码验证失败");
+                                           location.href = "{% url "host_list" %}?page={{ page }}"
+                                        }
+                                    });
+                                });
+                            //关机
+                            $("#shutdown{{ host.id }}").click(function () {
+                                    var id = {{ host.id }}; //获取变量iphone =input iphone_g的值
+                                    var ip = "{{ host.ip }}";
+                                    var port = {{ host.port }};
+                                    var user = "{{ host.user }}";
+                                    var password = "{{ host.password }}";
+                                    var cmd = "shutdown -h now";
+                                    var url = '{% url "host_shell" %}';  //设置变量URL的值
+                                    var data = {id:id,ip:ip,port:port,user:user,password:password,cmd:cmd,csrfmiddlewaretoken: '{{ csrf_token }}'};	//设置需要发送的数据
+                                    $.post(url,data,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                        if(msg.req_status=='1'){
+                                            alert("{{ host.ip }}关机成功，正在关机");
+                                            location.href = "{% url "host_list" %}?page={{ page }}"
+
+                                        }else{
+                                           alert("{{ host.ip }}关机失败,账号密码验证失败");
+                                           location.href = "{% url "host_list" %}?page={{ page }}"
+                                        }
+                                    });
+                                });
+
+
+                            })
+
+
+
+                    </script>
+                {% endfor %}
+
+              </tbody></table>
+            <div class="box-footer clearfix" style="padding-top: 100px;">
+              <ul class="pagination pagination-sm no-margin pull-right">
+                    <!--上一页-->
+                   {%  if contacts.has_previous %}
+                        <li><a href="{% url "host_list" %}?page={{ page|add:-1 }}">«</a></li>
+                   {% endif %}
+
+                  {%  if contacts.has_previous %}
+                    <li><a href="{% url "host_list" %}?page={{ page|add:-1 }}">{{ page|add:-1 }}</a></li>
+                  {% endif %}
+
+                  <li class="active"><a href="{% url "host_list" %}?page={{ page }}">{{ page }}</a></li>
+
+                  {%  if contacts.has_next %}
+                    <li><a href="{% url "host_list" %}?page={{ page|add:1 }}">{{ page|add:1 }}</a></li>
+                  {% endif %}
+                    <!--下一页-->
+                  {%  if contacts.has_next %}
+                    <li><a href="{% url "host_list" %}?page={{ page|add:1 }}">»</a></li>
+                  {% endif %}
+              </ul>
+            </div>
+
+
+
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+
+{% endblock %}
+
+<!--底部引入javascript-->
+{% block dibu_load_javascript %}
+    <script>
+        $(function () {
+            //location.href = "{% url "jifang_add" %}"
+        })
+
+    </script>
+
+{% endblock %}
+

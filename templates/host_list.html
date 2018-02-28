@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}主机列表{% endblock %}
+
+
+{% block tit %}主机列表{% endblock %}
+
+
+{% block titlescript %}
+        <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+{% endblock %}
+
+{% block context %}
+
+    <div class="row" style="padding-top: 10px;">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">主机列表清单</h3>
+
+              <div class="box-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">
+                  <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+
+                  <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+              <table class="table table-hover" style="padding-bottom: 100px;">
+                <tbody><tr>
+                  <th>ID</th>
+                  <th>IP</th>
+                  <th>User</th>
+                  <th>状态</th>
+                  <th>管理</th>
+                </tr>
+                <tr><td id="shuoming" style="margin: 0 auto;color: #00a65a"><span class="label label-success"></span></td></tr>
+                {% for host in contacts %}
+                <tr>
+                  <td>{{ host.id }}</td>
+                  <td>{{ host.ip }}</td>
+                  <td>{{ host.user }}</td>
+                  <td><span class="label label-success" id="zhuangtai{{ host.id }}"></span></td>
+                  <td>
+                      <div class="btn-group">
+                  <button type="button" class="btn btn-info">管理</button>
+                  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li id="host{{ host.id }}"><a href="/hostinfo/{{ host.id }}">查看详细信息</a></li>
+                      <li class="divider"></li>
+                    <li><a href="/hostmodify/{{ host.id }}/?ip={{ host.ip }}&port={{ host.port }}&user={{ host.user }}&password={{ host.password }}&status={{ host.status }}">修改</a></li>
+                    <li><a href="#" id="guanji{{ host.id }}">关机</a></li>
+                    <li><a href="#" id="chongqi{{ host.id }}">重启</a></li>
+                    <li class="divider" ></li>
+                      <li><a target="_blank" href="http://192.168.3.213/?ssh=ssh://{{ host.user }}@{{ host.ip }}:{{ host.port }}" id="cmd">cmd</a></li>
+                    <li><a href="#" id="del{{ host.id }}">删除</a></li>
+                  </ul>
+                </div>
+                    <button type="button" class="btn btn-success" id="update{{ host.id }}">更新主机信息</button>
+                    <span id="span{{ host.id }}"></span>
+                  </td>
+
+                </tr>
+
+                    <script>
+                        $(function(){
+                            $("#update{{ host.id }}").click(function () {
+                                var url="{% url "update" %}"
+                                var xinxi={
+                                    'host_id':"{{ host.id }}",
+                                    'ip':"{{ host.ip }}",
+                                    'port':{{ host.port }},
+                                    'user':"{{ host.user }}",
+                                    'password':"{{ host.password }}"
+                                }
+                                $.post(url,xinxi,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                    if(msg.code=='1') {
+                                        $("#shuoming").text("{{ host.ip }}更新完成");
+                                    }
+                                    else{
+                                        $("#shuoming").text("{{ host.ip }}更新失败");
+                                    }
+                                    });
+                            });
+
+                            $("#del{{ host.id }}").click(function () {
+                                var url="/hostdel/{{ host.id }}/"
+                                var xinxi={
+                                    'host_id':"{{ host.id }}",
+                                    'ip':"{{ host.ip }}",
+                                    'port':{{ host.port }},
+                                    'user':"{{ host.user }}",
+                                    'password':"{{ host.password }}"
+                                }
+                                $.get(url,xinxi,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                    if(msg.code=='2') {
+                                        $("#shuoming").text("删除{{ host.ip }}成功,2秒后跳转到主机列表");
+                                        setTimeout(function(){
+                                            window.location.href="{% url "hostlist" %}";
+                                        },2000);
+                                    }
+                                    else{
+                                        $("#shuoming").text("删除失败");
+                                    }
+                                    });
+                            });
+
+                            $("#guanji{{ host.id }}").click(function () {
+                                alert("测试环境，不能关机")
+                            })
+
+                            $("#chongqi{{ host.id }}").click(function () {
+                                alert("测试环境，不能重启")
+                            })
+
+
+
+                                var url="{% url "checkactive" %}"
+                                var xinxi={
+                                    'ip':"{{ host.ip }}",
+                                }
+                                $.get(url,xinxi,function(msg){  //get请求发送数据，并接受后端返回数据变量msg，msg名字可以自己定义
+                                    if(msg.active=='1') {
+                                        $("#zhuangtai{{ host.id }}").text("离线");
+                                    }
+                                    else{
+                                        $("#zhuangtai{{ host.id }}").text("在线");
+                                    }
+                                    });
+
+
+
+                        })
+
+
+                    </script>
+
+
+                {% endfor %}
+                <tr style="height: 180px;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td><span class="label label-success"></span></td>
+                  <td>
+                  </td>
+                </tr>
+
+
+              </tbody></table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+
+    <div class="box-footer clearfix">
+              <ul class="pagination pagination-sm no-margin pull-right">
+
+                <li><a href="#">«</a></li>
+                <li><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">»</a></li>
+              </ul>
+            </div>
+
+      </div>
+
+{% endblock %}
+
+<!--自定义JavaScript-->
+{% block script %}
+    <script>
+
+
+    </script>
+
+{% endblock %}

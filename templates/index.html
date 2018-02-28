@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}首页{% endblock %}
+
+<!--首部引入javascript-->
+{% block title_load_javascript %}{% endblock %}
+
+<!--右侧类容-->
+{% block context %}
+    <div style="padding-top: 20px">
+    <!--用户-->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3>{{ user_count }}</h3>
+
+              <p>用户</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-person-add"></i>
+            </div>
+            <a href="{% url "user_list" %}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+    <!--用户组-->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3>{{ user_group_count }}</h3>
+
+              <p>用户组</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-bag"></i>
+            </div>
+            <a href="{% url "user_group" %}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+    <!--主机-->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-green">
+            <div class="inner">
+              <h3>{{ hosts_count }}</h3>
+              <p>主机</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-stats-bars"></i>
+            </div>
+            <a href="{% url "host_list" %}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+    <!--机房-->
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-red">
+            <div class="inner">
+              <h3>{{ jifang_count }}</h3>
+
+              <p>机房</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-pie-graph"></i>
+            </div>
+            <a href="{% url "jifang_add" %}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!--底部引入javascript-->
+{% block dibu_load_javascript %}{% endblock %}
+

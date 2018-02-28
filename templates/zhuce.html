@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post" action="/zhuce/">
+    {% csrf_token %}
+    <table>
+        {{ obj.as_table }}
+    </table>
+    <!--
+        <p>用户名:{{ obj.username }}{{ obj.username.errors.as_text  }}</p>
+        <p>密码:{{ obj.pwd }}{{ obj.pwd.errors.as_text }}</p>
+        <p>ip:{{ obj.ip }}{{ obj.ip.errors.as_text }}</p>
+        <p>email:{{ obj.email }}{{ obj.email.errors.as_text }}</p>
+    -->
+<input type="submit" value="提交">{{ obj.errors }}
+</form>
+
+</body>
+</html>

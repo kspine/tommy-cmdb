@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}修改主机{% endblock %}
+
+{% block tit %}修改主机{% endblock %}
+{% block tit2 %}修改主机{% endblock %}
+
+{% block context %}
+
+    <div class="box box-info" style="margin-top: 10px;height: 745px">
+        <div class="tsts" style="width: 40% ;margin: 0 auto">
+            <div class="box-header with-border">
+
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form class="form-horizontal" action="/hostmodify/{{ id }}/" method="post">
+                {% csrf_token %}
+              <div class="box-body">
+                  <div class="form-group">
+                  <label for="inputEmail3" class="col-sm-2 control-label">ID : {{ id }}</label>
+                </div>
+                <div class="form-group">
+                  <label for="inputEmail3" class="col-sm-2 control-label">主机IP</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" value="{{ ip }}" id="ip" placeholder="主机IP" NAME="ip">
+                  </div>
+                </div>
+                  <div class="form-group">
+                  <label for="inputEmail3" class="col-sm-2 control-label">端口</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="port" value="{{ port }}" placeholder="端口" name="port">
+                  </div>
+                </div>
+                  <div class="form-group">
+                  <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="user" value="{{ user }}" placeholder="用户名" name="user">
+                  </div>
+                </div>
+
+
+                <div class="form-group">
+                  <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+
+                  <div class="col-sm-10">
+                    <input type="password" class="form-control" id="password" value="{{ password }}" placeholder="Password" name="password">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                          {% if status == '0' %}
+                              <input type="checkbox" name="status"> 禁用
+                          {% elif status == '1' %}
+                              <input type="checkbox" name="status" checked="checked"> 禁用
+                          {% endif %}
+
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- /.box-body -->
+                <center>
+              <div class="box-footer">
+                <button type="submit" class="btn btn-info">更新主机</button>
+              </div></center>
+              <!-- /.box-footer -->
+            </form>
+            </div>
+
+            {% if not none_err %}
+                <div class="external-event bg-red ui-draggable ui-draggable-handle" style="position: relative;">{{ err }}</div>
+            {% endif %}
+
+          </div>
+
+{% endblock %}

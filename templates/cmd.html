@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}CMD{% endblock %}
+
+{% block titlescript %}
+<script src="{% static "gateone.js" %}"></script>
+
+    <script>
+      window.onload = function() {
+          // Initialize Gate One:
+          GateOne.init({url: 'http://192.168.3.213/?check=True&ssh=ssh://root@192.168.3.201:22'});
+      }
+    </script>
+
+{% endblock %}
+
+{% block tit %}CMD{% endblock %}
+
+
+{% block context %}
+<div id="gateone_container" style="position: relative; width: 60em; height: 30em;">
+        <div id="gateone"></div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+
+
+{% endblock %}
